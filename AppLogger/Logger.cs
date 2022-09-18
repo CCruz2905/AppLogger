@@ -5,21 +5,38 @@ using System.Reflection;
 
 namespace AppLogger
 {
+    /// <summary>
+    /// Creates a file that will be used to known some important actions on an application
+    /// </summary>
     public class Logger
     {
+        /// <summary>
+        /// Full path of the file
+        /// </summary>
         private readonly string _path;
-        private readonly string AppName = Assembly.GetEntryAssembly().GetName().Name;
-        private readonly string BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private readonly string DateFormat = DateTime.Now.ToString("G", CultureInfo.InvariantCulture);
+        private readonly string AppName;
+        /// <summary>
+        /// Result of combining Documents/AppName
+        /// </summary>
+        private readonly string BaseDirectory;
+        /// <summary>
+        /// Date format used to register date time log
+        /// </summary>
+        private readonly string DateFormat;
 
         /// <summary>
         /// Creates an object where the path is by default on My Documents
         /// </summary>
         public Logger()
         {
+            AppName = Assembly.GetEntryAssembly().GetName().Name;
+            BaseDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), // My Documents
+                AppName); // Directory with the name of the app
+            DateFormat = DateTime.Now.ToString("G", CultureInfo.InvariantCulture);
+
             _path = Path.Combine(
-                BaseDirectory, // Documents
-                AppName, // Directory Name
+                BaseDirectory, // Documents/AppName
                 $"{AppName}Log.txt"); // Log file name
         }
 
@@ -38,8 +55,8 @@ namespace AppLogger
         /// <param name="message">Text that contains importan information</param>
         public void Log(string message)
         {
-            if (!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
+            if (!Directory.Exists(BaseDirectory))
+                Directory.CreateDirectory(BaseDirectory);
 
             using (StreamWriter wr = File.AppendText(_path))
             {
